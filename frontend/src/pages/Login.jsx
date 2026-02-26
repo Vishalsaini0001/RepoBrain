@@ -1,17 +1,21 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Terminal, Github, Zap, Eye, EyeOff } from 'lucide-react'
+import { useTheme } from '../contexts/ThemeContext'
+import { Eye, EyeOff, Sun, Moon, Code2, ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function Login() {
   const { login } = useAuth()
+  const { isDark, toggle } = useTheme()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
@@ -19,118 +23,132 @@ export default function Login() {
       await login(form.email, form.password)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed. Check your credentials.')
+      setError(err.response?.data?.detail || 'Invalid credentials. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-obsidian-950 grid-bg flex items-center justify-center relative overflow-hidden px-4">
-      {/* Background orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-neon-cyan/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neon-purple/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-page flex">
 
-      {/* Scanline effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-        <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent animate-scan" />
-      </div>
+      {/* ── Left panel (decorative) ── */}
+      <div
+        className="hidden lg:flex lg:w-[44%] flex-col justify-between p-12 relative overflow-hidden"
+        style={{ background: 'var(--accent)', color: '#fff' }}
+      >
+        {/* Decorative circles */}
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-20" style={{ background: 'rgba(255,255,255,.3)' }} />
+        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-10" style={{ background: 'rgba(255,255,255,.4)' }} />
+        <div className="absolute top-1/2 right-8 w-32 h-32 rounded-full opacity-15" style={{ background: 'rgba(255,255,255,.3)' }} />
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-obsidian-800 neon-border flex items-center justify-center">
-              <Terminal className="w-6 h-6 text-neon-cyan" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5 mb-14">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <Code2 size={16} className="text-white" />
             </div>
-            <span className="font-display text-2xl font-bold text-white tracking-tight">
-              Code<span className="neon-text">Mind</span>
-            </span>
+            <span className="text-white font-semibold text-lg">CodeMind</span>
           </div>
-          <h1 className="font-display text-3xl font-bold text-white mb-2">Welcome back</h1>
-          <p className="text-gray-500 font-body text-sm">Sign in to explore your codebases</p>
+          <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+            Talk to your<br />codebase.
+          </h1>
+          <p className="text-orange-100 text-base leading-relaxed max-w-xs">
+            Index any GitHub repo and ask questions in plain English. Find patterns, understand architecture, ship faster.
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="glass-card rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="relative z-10">
+          {[
+            { q: 'Where is the auth middleware?', a: 'Found in middleware/auth.js — uses JWT tokens with refresh rotation.' },
+            { q: 'How do I add a new API route?', a: 'Follow the pattern in routes/users.js — register in app.js line 47.' },
+          ].map((item, i) => (
+            <div key={i} className="mb-3 last:mb-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+              <p className="text-orange-100 text-xs font-mono mb-1.5 opacity-80">User asked:</p>
+              <p className="text-white text-sm font-medium mb-2">{item.q}</p>
+              <p className="text-orange-100 text-xs leading-relaxed opacity-90">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Right panel (form) ── */}
+      <div className="flex-1 flex flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-8 py-5">
+          <div className="lg:hidden flex items-center gap-2">
+            <Code2 size={18} style={{ color: 'var(--accent)' }} />
+            <span className="font-semibold text-base text-base">CodeMind</span>
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="text-sm text-sub">No account?</span>
+            <Link to="/register" className="btn btn-ghost text-sm">Create one</Link>
+            <button onClick={toggle} className="btn-icon" aria-label="Toggle theme">
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="flex-1 flex items-center justify-center px-8 py-12">
+          <div className="w-full max-w-sm animate-fade-in">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Welcome back</h2>
+              <p className="text-sub text-sm">Sign in to your CodeMind account</p>
+            </div>
+
             {error && (
-              <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-mono">
-                ⚠ {error}
+              <div className="flex items-start gap-2.5 p-3.5 rounded-lg mb-5 text-sm animate-slide-up"
+                   style={{ background: 'var(--bg-secondary)', border: '1px solid #fca5a5', color: '#dc2626' }}>
+                <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
+                {error}
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">
-                Email Address
-              </label>
-              <input
-                type="email"
-                required
-                className="input-field"
-                placeholder="dev@example.com"
-                value={form.email}
-                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono text-gray-400 mb-2 uppercase tracking-widest">
-                Password
-              </label>
-              <div className="relative">
+            <form onSubmit={submit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  EMAIL
+                </label>
                 <input
-                  type={showPass ? 'text' : 'password'}
-                  required
-                  className="input-field pr-12"
-                  placeholder="••••••••••"
-                  value={form.password}
-                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  type="email" required
+                  className="field"
+                  placeholder="you@company.com"
+                  value={form.email}
+                  onChange={e => set('email', e.target.value)}
                 />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-neon-cyan transition-colors"
-                  onClick={() => setShowPass(s => !s)}
-                >
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-obsidian-950/30 border-t-obsidian-950 rounded-full animate-spin" />
-                  <span>Authenticating...</span>
-                </>
-              ) : (
-                <>
-                  <Zap size={16} />
-                  <span>Sign In</span>
-                </>
-              )}
-            </button>
-          </form>
+              <div>
+                <label className="block text-xs font-mono font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  PASSWORD
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPass ? 'text' : 'password'} required
+                    className="field pr-10"
+                    placeholder="••••••••"
+                    value={form.password}
+                    onChange={e => set('password', e.target.value)}
+                  />
+                  <button type="button" className="btn-icon absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setShowPass(s => !s)}>
+                    {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+              </div>
 
-          <div className="mt-6 pt-6 border-t border-obsidian-700 text-center">
-            <p className="text-gray-500 text-sm font-body">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-neon-cyan hover:text-neon-green transition-colors font-medium">
-                Create one
-              </Link>
+              <button type="submit" disabled={loading} className="btn btn-primary w-full mt-6" style={{ padding: '.625rem' }}>
+                {loading
+                  ? <><div className="spinner" style={{ borderTopColor: '#fff', borderColor: 'rgba(255,255,255,.3)' }} />Signing in…</>
+                  : <>Sign In <ArrowRight size={14} /></>
+                }
+              </button>
+            </form>
+
+            <p className="mt-8 text-center text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+              Powered by Groq · LLaMA 3.3 70B · ChromaDB
             </p>
           </div>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-gray-600 text-xs font-mono mt-6">
-          <Github size={12} className="inline mr-1" />
-          AI-powered codebase intelligence
-        </p>
       </div>
     </div>
   )

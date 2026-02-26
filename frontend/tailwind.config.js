@@ -1,47 +1,47 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        mono: ['"JetBrains Mono"', 'monospace'],
-        display: ['"Syne"', 'sans-serif'],
-        body: ['"DM Sans"', 'sans-serif'],
+        sans: ['"Outfit"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
       },
       colors: {
-        obsidian: {
-          950: '#030712',
-          900: '#060d1f',
-          800: '#0a1628',
-          700: '#0f2040',
-          600: '#162a52',
+        brand: {
+          50:  '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
         },
-        neon: {
-          cyan: '#00e5ff',
-          green: '#00ff88',
-          purple: '#bf5fff',
-          orange: '#ff6b35',
-        },
+        surface: {
+          light: '#fafaf9',
+          DEFAULT: '#f5f5f4',
+          dark: '#1c1917',
+          darker: '#0c0a09',
+        }
+      },
+      boxShadow: {
+        'card': '0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)',
+        'card-hover': '0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04)',
+        'panel': '0 8px 32px rgba(0,0,0,.08)',
+        'glow': '0 0 0 3px rgba(249,115,22,.2)',
       },
       animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'scan': 'scan 2s linear infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
+        'fade-in': 'fadeIn .2s ease-out',
+        'slide-up': 'slideUp .25s ease-out',
+        'spin-slow': 'spin 2s linear infinite',
+        'blink': 'blink 1.2s step-end infinite',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
-        scan: {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(100%)' },
-        },
-        glow: {
-          from: { boxShadow: '0 0 5px #00e5ff, 0 0 10px #00e5ff' },
-          to: { boxShadow: '0 0 20px #00e5ff, 0 0 40px #00e5ff, 0 0 60px #00e5ff' },
-        },
+        fadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
+        slideUp: { from: { opacity: 0, transform: 'translateY(8px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+        blink: { '0%,100%': { opacity: 1 }, '50%': { opacity: 0 } },
       },
     },
   },

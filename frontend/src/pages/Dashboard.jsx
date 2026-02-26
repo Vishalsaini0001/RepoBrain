@@ -1,215 +1,219 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { reposAPI } from '../api/client'
 import RepoSidebar from '../components/RepoSidebar'
 import ChatInterface from '../components/ChatInterface'
 import {
-  Terminal, LogOut, Menu, X, ChevronRight,
-  Github, Cpu, Database, Zap
+  Code2, LogOut, Sun, Moon, Menu, X,
+  Github, FileCode, GitBranch, Clock, ChevronRight,
+  Cpu, MessageSquare, Zap, Database
 } from 'lucide-react'
 
-function Navbar({ user, onLogout, onMenuToggle, menuOpen }) {
+/* ── Topbar ── */
+function Topbar({ user, onLogout, onMenuClick, sidebarOpen, isDark, toggleTheme }) {
   return (
-    <header className="h-14 border-b border-obsidian-700/60 glass-card flex items-center justify-between px-4 sticky top-0 z-50">
+    <header className="h-12 flex items-center justify-between px-4 border-b flex-shrink-0"
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)', zIndex: 40 }}>
       <div className="flex items-center gap-3">
-        {/* Mobile menu toggle */}
-        <button
-          onClick={onMenuToggle}
-          className="lg:hidden w-8 h-8 flex items-center justify-center text-gray-400 hover:text-neon-cyan transition-colors"
-        >
-          {menuOpen ? <X size={16} /> : <Menu size={16} />}
+        <button className="btn-icon lg:hidden" onClick={onMenuClick}>
+          {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
         </button>
-
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-obsidian-800 neon-border flex items-center justify-center">
-            <Terminal size={13} className="text-neon-cyan" />
-          </div>
-          <span className="font-display font-bold text-white text-base tracking-tight hidden sm:block">
-            Code<span className="neon-text">Mind</span>
-          </span>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-1 ml-2 text-xs font-mono text-gray-600">
-          <ChevronRight size={12} />
-          <span className="text-gray-400">{user?.username}</span>
+        <div className="flex items-center gap-2">
+          <Code2 size={17} style={{ color: 'var(--accent)' }} />
+          <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>CodeMind</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Status indicator */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-obsidian-800/60 border border-obsidian-600/40">
-          <span className="pulse-dot w-1.5 h-1.5" />
-          <span className="text-xs font-mono text-gray-500">AI Ready</span>
-        </div>
-
-        {/* User avatar */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-neon-purple/20 border border-neon-purple/30 flex items-center justify-center">
-            <span className="text-neon-purple text-xs font-display font-bold">
-              {user?.username?.[0]?.toUpperCase()}
-            </span>
+      <div className="flex items-center gap-2">
+        {/* User chip */}
+        <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono"
+             style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+          <div className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+               style={{ background: 'var(--accent)', fontSize: 9 }}>
+            {user?.username?.[0]?.toUpperCase()}
           </div>
-          <span className="text-sm text-gray-400 font-body hidden sm:block">{user?.username}</span>
+          {user?.username}
         </div>
 
-        <button
-          onClick={onLogout}
-          className="w-8 h-8 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all flex items-center justify-center"
-          title="Sign out"
-        >
-          <LogOut size={14} />
+        <button onClick={toggleTheme} className="btn-icon tooltip" data-tip={isDark ? 'Light mode' : 'Dark mode'}>
+          {isDark ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
+
+        <button onClick={onLogout} className="btn-icon tooltip" data-tip="Sign out">
+          <LogOut size={15} />
         </button>
       </div>
     </header>
   )
 }
 
-function WelcomeScreen() {
+/* ── Repo stats panel (right panel) ── */
+function RepoStats({ repo }) {
+  if (!repo || repo.status !== 'ready') return null
+  const lines = [
+    { icon: FileCode, label: 'Files indexed', value: repo.file_count.toLocaleString() },
+    { icon: Database, label: 'Code chunks', value: repo.chunk_count.toLocaleString() },
+    { icon: GitBranch, label: 'Branch', value: repo.branch },
+    { icon: Cpu, label: 'Embedding model', value: 'MiniLM-L6-v2' },
+    { icon: Zap, label: 'LLM', value: 'LLaMA 3.3 70B' },
+  ]
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="text-center max-w-2xl">
-        {/* Animated icon cluster */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center animate-float" style={{ animationDelay: '0s' }}>
-            <Github size={24} className="text-neon-cyan" />
+    <aside className="hidden xl:flex flex-col w-60 border-l flex-shrink-0"
+           style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)' }}>
+      <div className="px-4 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-xs font-mono font-semibold" style={{ color: 'var(--text-muted)' }}>REPO INFO</p>
+      </div>
+      <div className="flex-1 px-4 py-4 space-y-4">
+        {lines.map(({ icon: Icon, label, value }) => (
+          <div key={label}>
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <Icon size={11} style={{ color: 'var(--text-muted)' }} />
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{label}</span>
+            </div>
+            <p className="text-sm font-medium font-mono" style={{ color: 'var(--text-primary)' }}>{value}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-obsidian-800 border border-obsidian-600 flex items-center justify-center">
-            <ChevronRight size={16} className="text-neon-cyan" />
-          </div>
-          <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center animate-float" style={{ animationDelay: '1s' }}>
-            <Cpu size={24} className="text-neon-purple" />
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-obsidian-800 border border-obsidian-600 flex items-center justify-center">
-            <ChevronRight size={16} className="text-neon-cyan" />
-          </div>
-          <div className="w-14 h-14 rounded-2xl bg-neon-green/10 border border-neon-green/20 flex items-center justify-center animate-float" style={{ animationDelay: '2s' }}>
-            <Zap size={24} className="text-neon-green" />
-          </div>
-        </div>
+        ))}
+      </div>
 
-        <h2 className="font-display text-4xl font-bold text-white mb-4 leading-tight">
-          Explore any codebase<br />
-          <span className="neon-text">with AI</span>
-        </h2>
-        <p className="text-gray-500 font-body text-base leading-relaxed mb-8 max-w-lg mx-auto">
-          Index a GitHub repository, then ask questions in natural language.
-          Understand architecture, find patterns, and navigate unfamiliar code instantly.
+      {/* Repo URL */}
+      <div className="px-4 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-xs font-mono mb-1.5" style={{ color: 'var(--text-muted)' }}>REPOSITORY</p>
+        <a href={repo.repo_url} target="_blank" rel="noreferrer"
+           className="flex items-center gap-1.5 text-xs font-mono hover:underline"
+           style={{ color: 'var(--accent)', wordBreak: 'break-all' }}>
+          <Github size={10} />
+          {repo.repo_url.replace('https://github.com/', '')}
+        </a>
+      </div>
+    </aside>
+  )
+}
+
+/* ── Welcome / no selection ── */
+function Welcome() {
+  const features = [
+    { icon: Github, title: 'Index any repo', desc: 'Paste a GitHub URL and we clone, split, and embed it.' },
+    { icon: Database, title: 'Semantic search', desc: 'Sentence Transformers find the most relevant code.' },
+    { icon: Cpu, title: 'LLaMA 70B answers', desc: 'Groq-powered LLM generates precise, grounded responses.' },
+    { icon: MessageSquare, title: 'Per-user history', desc: 'Chats are saved to MongoDB per user & per repo.' },
+  ]
+  return (
+    <div className="flex-1 flex items-center justify-center p-8 animate-fade-in" style={{ background: 'var(--bg)' }}>
+      <div className="max-w-xl w-full text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5"
+             style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-light)' }}>
+          <Code2 size={26} style={{ color: 'var(--accent)' }} />
+        </div>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to CodeMind</h2>
+        <p className="text-sub text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+          Index a GitHub repository from the sidebar, then ask questions about the code in plain English.
         </p>
 
-        {/* Feature grid */}
-        <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto">
-          {[
-            { icon: Database, color: 'cyan', label: 'Vector Search', desc: 'Semantic code retrieval' },
-            { icon: Cpu, color: 'purple', label: 'LLaMA 70B', desc: 'Powered by Groq' },
-            { icon: Zap, color: 'green', label: 'Instant Answers', desc: 'Sub-second responses' },
-          ].map(({ icon: Icon, color, label, desc }) => (
-            <div key={label} className={`glass-card rounded-xl p-4 text-center border-obsidian-700/60`}>
-              <Icon size={18} className={`mx-auto mb-2 text-neon-${color}`} />
-              <p className="text-xs font-display font-semibold text-white">{label}</p>
-              <p className="text-xs text-gray-600 font-mono mt-0.5">{desc}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+          {features.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="p-4 rounded-xl"
+                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Icon size={14} style={{ color: 'var(--accent)' }} />
+                <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</span>
+              </div>
+              <p className="text-xs text-sub leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
 
-        <p className="mt-8 text-xs text-gray-600 font-mono">
-          ← Add a repository from the sidebar to get started
+        <p className="mt-6 text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+          ← Click "Add" in the sidebar to get started
         </p>
       </div>
     </div>
   )
 }
 
+/* ── Dashboard ── */
 export default function Dashboard() {
   const { user, logout } = useAuth()
+  const { isDark, toggle } = useTheme()
   const [repos, setRepos] = useState([])
   const [selectedRepo, setSelectedRepo] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true)
 
   const fetchRepos = useCallback(async () => {
     try {
       const res = await reposAPI.list()
       setRepos(res.data)
-      // Auto-select first ready repo if none selected
-      if (!selectedRepo) {
-        const ready = res.data.find(r => r.status === 'ready')
-        if (ready) setSelectedRepo(ready)
-      } else {
-        // Update selected repo data
+      // Keep selected repo up to date
+      if (selectedRepo) {
         const updated = res.data.find(r => r.id === selectedRepo.id)
         if (updated) setSelectedRepo(updated)
       }
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
+    } catch (_) {}
+    finally { setInitialLoading(false) }
   }, [selectedRepo?.id])
 
-  useEffect(() => {
-    fetchRepos()
-    // Poll while any repo is indexing
-    const interval = setInterval(() => {
-      const hasIndexing = repos.some(r => r.status === 'indexing')
-      if (hasIndexing) fetchRepos()
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [repos.some?.(r => r.status === 'indexing')])
+  useEffect(() => { fetchRepos() }, [])
 
+  // Poll for indexing repos
   useEffect(() => {
-    fetchRepos()
-  }, [])
+    const hasIndexing = repos.some(r => r.status === 'indexing')
+    if (!hasIndexing) return
+    const t = setInterval(fetchRepos, 5000)
+    return () => clearInterval(t)
+  }, [repos, fetchRepos])
 
   const handleRepoDeleted = (id) => {
-    setRepos(prev => prev.filter(r => r.id !== id))
+    setRepos(p => p.filter(r => r.id !== id))
     if (selectedRepo?.id === id) setSelectedRepo(null)
   }
 
   return (
-    <div className="min-h-screen bg-obsidian-950 grid-bg flex flex-col">
-      {/* Background effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-neon-cyan/3 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-neon-purple/3 rounded-full blur-3xl" />
-      </div>
+    <div className="flex flex-col h-screen" style={{ background: 'var(--bg)' }}>
+      <Topbar
+        user={user} onLogout={logout}
+        onMenuClick={() => setSidebarOpen(s => !s)}
+        sidebarOpen={sidebarOpen}
+        isDark={isDark} toggleTheme={toggle}
+      />
 
-      <div className="relative z-10 flex flex-col h-screen">
-        <Navbar user={user} onLogout={logout} onMenuToggle={() => setSidebarOpen(s => !s)} menuOpen={sidebarOpen} />
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar */}
+        <aside className={`
+          flex-shrink-0 w-64 border-r flex flex-col overflow-hidden
+          ${sidebarOpen ? 'absolute inset-y-0 left-0 z-30 shadow-lg' : 'hidden'}
+          lg:flex lg:static lg:shadow-none
+        `} style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+          <RepoSidebar
+            repos={repos}
+            selectedRepo={selectedRepo}
+            onSelect={repo => { setSelectedRepo(repo); setSidebarOpen(false) }}
+            onReposChange={fetchRepos}
+            onRepoDeleted={handleRepoDeleted}
+          />
+        </aside>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar */}
-          <aside className={`
-            flex-shrink-0 w-72 border-r border-obsidian-700/60 bg-obsidian-900/40 backdrop-blur-sm
-            lg:flex lg:flex-col
-            ${sidebarOpen ? 'flex flex-col absolute inset-y-0 left-0 z-40 mt-14' : 'hidden'}
-          `}>
-            <RepoSidebar
-              repos={repos}
-              selectedRepo={selectedRepo}
-              onSelect={(repo) => { setSelectedRepo(repo); setSidebarOpen(false) }}
-              onReposChange={fetchRepos}
-              onRepoDeleted={handleRepoDeleted}
-            />
-          </aside>
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div className="lg:hidden fixed inset-0 bg-black/40 z-20"
+               onClick={() => setSidebarOpen(false)} />
+        )}
 
-          {/* Overlay for mobile sidebar */}
-          {sidebarOpen && (
-            <div className="lg:hidden fixed inset-0 z-30 bg-black/60 mt-14" onClick={() => setSidebarOpen(false)} />
+        {/* Main */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {initialLoading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="spinner spinner-lg" />
+            </div>
+          ) : selectedRepo ? (
+            <ChatInterface repo={selectedRepo} key={selectedRepo.id} />
+          ) : (
+            <Welcome />
           )}
+        </main>
 
-          {/* Main chat area */}
-          <main className="flex-1 flex flex-col overflow-hidden">
-            {loading ? (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-neon-cyan/20 border-t-neon-cyan rounded-full animate-spin" />
-              </div>
-            ) : selectedRepo ? (
-              <ChatInterface repo={selectedRepo} key={selectedRepo.id} />
-            ) : (
-              <WelcomeScreen />
-            )}
-          </main>
-        </div>
+        {/* Right stats panel */}
+        <RepoStats repo={selectedRepo} />
       </div>
     </div>
   )

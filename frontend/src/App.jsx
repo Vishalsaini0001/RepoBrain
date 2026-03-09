@@ -12,7 +12,7 @@ function Protected({ children }) {
     <div className="min-h-screen bg-page flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="spinner spinner-lg" />
-        <p className="text-sub text-sm font-mono">Loading CodeMind…</p>
+        <p className="text-sub text-sm font-mono">Loading RepoBrain...</p>
       </div>
     </div>
   )

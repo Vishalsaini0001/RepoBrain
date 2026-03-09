@@ -48,7 +48,7 @@ export default function Register() {
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--accent)' }}>
             <Code2 size={16} className="text-white" />
           </div>
-          <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>CodeMind</span>
+          <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>RepoBrain</span>
         </div>
 
         <div>
@@ -79,7 +79,7 @@ export default function Register() {
         <div className="flex items-center justify-between px-8 py-5">
           <div className="lg:hidden flex items-center gap-2">
             <Code2 size={18} style={{ color: 'var(--accent)' }} />
-            <span className="font-semibold text-base">CodeMind</span>
+            <span className="font-semibold text-base">RepoBrain</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="text-sm text-sub">Have an account?</span>
@@ -94,7 +94,7 @@ export default function Register() {
           <div className="w-full max-w-sm animate-fade-in">
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Create account</h2>
-              <p className="text-sub text-sm">Get started with CodeMind for free</p>
+              <p className="text-sub text-sm">Get started with RepoBrain for free</p>
             </div>
 
             {error && (

@@ -21,7 +21,7 @@ function Topbar({ user, onLogout, onMenuClick, sidebarOpen, isDark, toggleTheme 
         </button>
         <div className="flex items-center gap-2">
           <Code2 size={17} style={{ color: 'var(--accent)' }} />
-          <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>CodeMind</span>
+          <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>RepoBrain</span>
         </div>
       </div>
 
@@ -105,7 +105,7 @@ function Welcome() {
              style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-light)' }}>
           <Code2 size={26} style={{ color: 'var(--accent)' }} />
         </div>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to CodeMind</h2>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Welcome to RepoBrain</h2>
         <p className="text-sub text-sm mb-8 max-w-sm mx-auto leading-relaxed">
           Index a GitHub repository from the sidebar, then ask questions about the code in plain English.
         </p>

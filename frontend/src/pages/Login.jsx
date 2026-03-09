@@ -47,7 +47,7 @@ export default function Login() {
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
               <Code2 size={16} className="text-white" />
             </div>
-            <span className="text-white font-semibold text-lg">CodeMind</span>
+            <span className="text-white font-semibold text-lg">RepoBrain</span>
           </div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             Talk to your<br />codebase.
@@ -77,7 +77,7 @@ export default function Login() {
         <div className="flex items-center justify-between px-8 py-5">
           <div className="lg:hidden flex items-center gap-2">
             <Code2 size={18} style={{ color: 'var(--accent)' }} />
-            <span className="font-semibold text-base text-base">CodeMind</span>
+            <span className="font-semibold text-base text-base">RepoBrain</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <span className="text-sm text-sub">No account?</span>
@@ -93,7 +93,7 @@ export default function Login() {
           <div className="w-full max-w-sm animate-fade-in">
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Welcome back</h2>
-              <p className="text-sub text-sm">Sign in to your CodeMind account</p>
+              <p className="text-sub text-sm">Sign in to your RepoBrain account</p>
             </div>
 
             {error && (
